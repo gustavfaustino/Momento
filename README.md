@@ -91,20 +91,71 @@ suprimentos.escritorio_id from suprimentos order by (custo / quantidade) desc li
 * **Um novo departamento foi criado. O departamento de Inovações.** 
 Ele será locado no Brasil. Por favor, adicione-o no banco de dados da empresa colocando quaisquer informações que você achar relevantes.
 
+R:
+```sql
+insert into momento.escritorios(escritorio_id, escritorio_nome, endereco, cep, cidade, estado_provincia,pais_id)
+ values (4200, "New Londo Ruins", "2230 Avenida Paulista", "01311-000", "São Paulo", "São Paulo", "BR");
+
+ insert into momento.departamentos (departamento_id, departamento_nome, escritorio_id)
+values (14, "Inovações", 4200);
+```
+
 * O departamento de Inovações está sem funcionários. Inclua alguns colegas de turma nesse departamento.  
+
+R:
+```sql
+insert into momento.funcionarios 
+(funcionario_id, primeiro_nome, sobrenome, email, senha, telefone, data_contratacao, cargo_id, salario, gerente_id, departamento_id)
+values 
+(2001, "Lucas", "Ferreira", "lucas.ferreira@example.com", "senha123", "+5511999990001", "2024-11-01", 20, 21000.00, NULL, 14),
+(2002, "Ana", "Silva", "ana.silva@example.com", "senha123", "+5511999990002", "2024-11-01", 14, 9000.00, NULL, 14),
+(2003, "Marcos", "Lima", "marcos.lima@example.com", "senha123", "+5511999990003", "2024-11-01", 21, 8000.00, NULL, 14),
+(2004, "Beatriz", "Santos", "beatriz.santos@example.com", "senha123", "+5511999990004", "2024-11-01", 15, 12000.00, NULL, 14),
+(2005, "Ricardo", "Oliveira", "ricardo.oliveira@example.com", "senha123", "+5511999990005", "2024-11-01", 10, 9500.00, NULL, 14);
+```
 
 ### Funcionários
 
 * Quantos funcionários da empresa Momento possuem conjuges?
 
+R: 4
+```sql
+select count(*) from momento.dependentes where dependentes.relacionamento like "Conjuge%";
+```
+
 * Qual o funcionário contratado há mais tempo na empresa?
+
+R: Steven Wayne
+```sql
+select concat(primeiro_nome, " ", sobrenome) as "Nome", data_contratacao as "Data do contrato" from momento.funcionarios order by data_contratacao asc limit 1;
+```
 
 * Qual o funcionário contratado há menos tempo na empresa?
 
+R: Antes das adições era Zatanna Zatara, porém agora é Ricardo Oliveira.
+```sql
+select concat(primeiro_nome, " ", sobrenome) as "Nome", data_contratacao as "Data do contrato" from momento.funcionarios order by data_contratacao desc limit 1;
+```
+
 * Quem são os funcionários com mais tempo na empresa, considerando a `data_contratacao`?
+
+R: Os 3 mais velhos na empresa são: Steven Wayne, Jennifer Whalen, Neena Kochhar.
+```sql
+select concat(primeiro_nome, " ", sobrenome) as "Nome", data_contratacao as "Data do contrato" from momento.funcionarios order by data_contratacao asc limit 3;
+```
 
 * Como a média salarial dos funcionários da "Momento" evoluiu nos últimos anos?
 Dica: utilize a função `AVG()` para calcular a média salarial dos funcionários. e `GROUP BY` para agrupar os resultados por ano.
+
+R:
+```sql
+select 
+ extract(year from data_contratacao) as year,
+ round(avg(funcionarios.salario),2) as "Média salarial no ano"
+ from funcionarios 
+ group by extract(year from data_contratacao)
+ order by extract(year from data_contratacao);
+ ```
 
 ### Médias salariais
 

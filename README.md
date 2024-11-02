@@ -161,22 +161,107 @@ select
 
 * Qual a média salarial dos funcionários da empresa Momento, excluindo-se o CEO, CMO e CFO?
 
+R: 8728.60
+```sql
+select round(avg (salario),2) as media_salarial from momento.funcionarios where cargo_id not in (select cargo_id from momento.cargos where cargo_nome in ("CEO","CFO","CMO"));
+```
+
 * Qual a média salarial do departamento de tecnologia? 
 
+R: 9769.02
+```sql
+ select round(avg (salario),2) as media_salarial_tecnologia from momento.funcionarios where departamento_id not in (select departamento_id from momento.departamentos where departamento_nome like "Tecnologia");
+ ```
 * Qual o departamento com a maior média salarial?
 
+R: Tecnologias Avançadas
+```sql
+select funcionarios.departamento_id, round(avg (salario),2) as media_salarial, departamentos.departamento_nome from momento.funcionarios 
+inner join momento.departamentos
+on departamentos.departamento_id = funcionarios.departamento_id
+group by departamento_id order by media_salarial desc limit 1;
+```
+
 * Qual o departamento com o menor número de funcionários?
+
+R: Os três com menos funcionários são: Administração, Relações Públicas e Recursos Humanos
+```sql
+select funcionarios.departamento_id, count(*) as quant_funcionarios, departamentos.departamento_nome from funcionarios 
+inner join momento.departamentos on departamentos.departamento_id = funcionarios.departamento_id
+group by departamento_id order by quant_funcionarios asc limit 3;
+```
 
 ### Produtos
 
 * Pensando na relação quantidade e valor unitario, qual o produto mais valioso da empresa?
 
+R: Sabre de luz do Mace Windu
+```sql
+select * from momento.produtos order by produto_price desc limit 1;
+```
 * Qual o produto mais vendido da empresa?
 
+R: Uniforme do Superman
+```sql
+SELECT 
+	produtos.produto_id,
+    produtos.produto_nome AS "Nome do produto",
+    MAX(quantidade) AS qnt_vendido
+FROM 
+    vendas 
+INNER JOIN 
+    produtos ON produtos.produto_id = vendas.produto_id
+GROUP BY 
+    produtos.produto_id
+order by qnt_vendido desc limit 1;
+```
+
 * Qual o produto menos vendido da empresa?
+
+R: Batarangs oficiais
+```sql
+SELECT 
+	produtos.produto_id,
+    produtos.produto_nome AS "Nome do produto",
+    MAX(quantidade) AS qnt_vendido
+FROM 
+    vendas 
+INNER JOIN 
+    produtos ON produtos.produto_id = vendas.produto_id
+GROUP BY 
+    produtos.produto_id
+order by qnt_vendido asc limit 1;
+```
 
 ### Escritórios
 
 * Quantos escritórios a "Momento" possui em cada região? (Dica: relacione as tabelas regioes e escritorios).
 
+R:
+Americas	5,
+Europa	4,
+Sul da Asia ou Africa	1
+
+```sql
+    SELECT regioes.regiao_nome, COUNT(escritorios.escritorio_id) AS total_escritorios
+FROM momento.escritorios
+INNER JOIN momento.paises ON paises.pais_id = escritorios.pais_id
+INNER JOIN momento.regioes ON regioes.regiao_id = paises.regiao_id
+GROUP BY regioes.regiao_nome;
+```
+
 * Qual é o custo total de suprimentos em cada escritório? Que tal ordenar os resultados para ver qual escritório possui os suprimentos mais caros?
+
+R: O escritório mais caro é a Umbrella Corp
+```sql
+-- Custo total em cada escritorio
+select suprimentos.escritorio_id, escritorios.escritorio_nome, sum(custo) as soma_custos from momento.suprimentos
+inner join escritorios on escritorios.escritorio_id = suprimentos.escritorio_id
+group by escritorio_id;
+
+-- Agora, ordenado
+select suprimentos.escritorio_id, escritorios.escritorio_nome, sum(custo) as soma_custos from momento.suprimentos
+inner join escritorios on escritorios.escritorio_id = suprimentos.escritorio_id
+group by escritorio_id
+order by soma_custos desc limit 1;
+```

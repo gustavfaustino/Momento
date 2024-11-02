@@ -112,6 +112,11 @@ values
 (2003, "Marcos", "Lima", "marcos.lima@example.com", "senha123", "+5511999990003", "2024-11-01", 21, 8000.00, NULL, 14),
 (2004, "Beatriz", "Santos", "beatriz.santos@example.com", "senha123", "+5511999990004", "2024-11-01", 15, 12000.00, NULL, 14),
 (2005, "Ricardo", "Oliveira", "ricardo.oliveira@example.com", "senha123", "+5511999990005", "2024-11-01", 10, 9500.00, NULL, 14);
+
+-- Acabei percebendo depois que o email da Momento não estava presente, então rodei esse utilizei esse comando:
+UPDATE momento.funcionarios
+SET email = CONCAT(LOWER(primeiro_nome), '.', LOWER(sobrenome), '@momento.org')
+WHERE departamento_id = 14;
 ```
 
 ### Funcionários
